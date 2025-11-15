@@ -5,7 +5,6 @@ import entities.Bullet;
 import entities.Player;
 import jdk.jshell.spi.ExecutionControl;
 import processing.core.PApplet;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +54,13 @@ public class Game {
         }
         if (shotPressed && shotTimer==0){
             spawnBullet();
+            shotTimer = shootCooldownFrames;
+        }
+        if (bullets!=null){
+            bullets.removeIf(b ->{
+                b.update(p);
+                return b.isOffScreen(Settings.HEIGHT);
+            });
         }
     }
 
@@ -65,8 +71,8 @@ public class Game {
                 drawStartScreen(p);
                 break;
             case PLAY:
-
                 player.draw(p);
+                drawBullets(p);
                 drawGameScreen(p);
                 break;
             case GAME_OVER:
@@ -85,7 +91,7 @@ public class Game {
                 leftPressed = true;
             } else if (keyCode == 'D' || keyCode=='d'){
                 rightPressed = true;
-            } else if (keyCode == 32){ //spacja
+            } else if (keyCode == ' '){ //spacja
                 shotPressed = true;
             }
         }
@@ -94,9 +100,13 @@ public class Game {
         if (gameState == GameState.PLAY){
             if (keyCode == 'A' || keyCode=='a'){
                 leftPressed = false;
-            } else if (keyCode == 'D' || keyCode=='d'){
+            }
+            else if (keyCode == 'D' || keyCode=='d'){
                 rightPressed = false;
-            };
+            }
+            else if (keyCode == ' '){ //spacja
+                shotPressed = false;
+            }
         }
     }
 
@@ -181,6 +191,15 @@ public class Game {
     }
     //spawnowanie nabojow
     private void spawnBullet(){
-        throw new UnsupportedOperationException("Not implemented yet");
+        Bullet bullet = new Bullet(player.getX(), player.getY() - Settings.PLAYER_HEIGHT / 2f, Settings.BULLET_SPEED);
+        bullets.add(bullet);
+    }
+    //rysowanie nabojow
+    private void drawBullets(PApplet p){
+        if (bullets!=null){
+            for (Bullet b : bullets){
+                b.draw(p);
+            }
+        }
     }
 }
