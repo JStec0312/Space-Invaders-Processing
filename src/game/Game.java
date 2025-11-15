@@ -1,11 +1,12 @@
 package game;
 
 import config.Settings;
-import entities.Bullet;
+import entities.PlayerBullet;
 import entities.Player;
-import jdk.jshell.spi.ExecutionControl;
+import entities.Wall;
 import processing.core.PApplet;
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class Game {
@@ -22,9 +23,10 @@ public class Game {
 ;
     //Player and bullets
     private Player player;
-    private List<Bullet> bullets;
+    private List<PlayerBullet> bullets;
     private int shootCooldownFrames = Settings.BULLET_COOLDOWN_FRAMES;
     private int shotTimer = 0;
+    private List<Wall> walls;
 
     //enemies
     //@TODO dodać wrogów
@@ -53,7 +55,7 @@ public class Game {
             shotTimer--;
         }
         if (shotPressed && shotTimer==0){
-            spawnBullet();
+            spawnPlayerBullet();
             shotTimer = shootCooldownFrames;
         }
         if (bullets!=null){
@@ -62,6 +64,8 @@ public class Game {
                 return b.isOffScreen(Settings.HEIGHT);
             });
         }
+        detectPlayerBulletWallCollisions();
+
     }
 
     public void draw(PApplet p ){
@@ -74,6 +78,7 @@ public class Game {
                 player.draw(p);
                 drawBullets(p);
                 drawGameScreen(p);
+                drawWalls(p);
                 break;
             case GAME_OVER:
                 // rysowanie ekranu końcowego
@@ -152,17 +157,17 @@ public class Game {
                     case 0:
                         difficulty = Difficulty.EASY;
                         lives = Settings.PLAYER_LIVES_EASY;
-                        enemySpeed = Settings.ENEMY_SPEED_EASY;
+                        enemySpeed = Settings.ENEMY_SPEED_EASY_BASE;
                         break;
                     case 1:
                         difficulty = Difficulty.MEDIUM;
                         lives = Settings.PLAYER_LIVES_MEDIUM;
-                        enemySpeed = Settings.ENEMY_SPEED_MEDIUM;
+                        enemySpeed = Settings.ENEMY_SPEED_MEDIUM_BASE;
                         break;
                     case 2:
                         difficulty = Difficulty.HARD;
                         lives = Settings.PLAYER_LIVES_HARD;
-                        enemySpeed = Settings.ENEMY_SPEED_HARD;
+                        enemySpeed = Settings.ENEMY_SPEED_HARD_BASE;
                         break;
                 }
                 startNewGame();
@@ -172,8 +177,19 @@ public class Game {
 
     // rozpoczynamy nową grę
     private void startNewGame(){
-        player = new Player(Settings.PLAYER_INITIAL_X, Settings.PLAYER_INITIAL_Y);
+        player = new Player(Settings.PLAYER_INITIAL_X, Settings.PLAYER_INITIAL_Y, lives);
         bullets = new ArrayList<>();
+        walls = new ArrayList<>();
+        float initialWallX = Settings.FIRST_WALL_X;
+        float wallY = Settings.FIRST_WALL_Y;
+        float wallSpacing = Settings.WALL_SPACING;
+        float step = Settings.WALL_WIDTH + wallSpacing;
+
+        for (int i=0; i<Settings.WALL_COUNT; i++){
+            Wall wall = new Wall(initialWallX, wallY);
+            walls.add(wall);
+            initialWallX += step;
+        }
         score = 0;
         gameState = GameState.PLAY;
     }
@@ -190,15 +206,46 @@ public class Game {
 
     }
     //spawnowanie nabojow
-    private void spawnBullet(){
-        Bullet bullet = new Bullet(player.getX(), player.getY() - Settings.PLAYER_HEIGHT / 2f, Settings.BULLET_SPEED);
+    private void spawnPlayerBullet(){
+        PlayerBullet bullet = new PlayerBullet(player.getX(), player.getY() - Settings.PLAYER_HEIGHT / 2f, Settings.PLAYER_BULLET_SPEED, Settings.PLAYER_BULLET_RADIUS);
         bullets.add(bullet);
     }
     //rysowanie nabojow
     private void drawBullets(PApplet p){
         if (bullets!=null){
-            for (Bullet b : bullets){
+            for (PlayerBullet b : bullets){
                 b.draw(p);
+            }
+        }
+    }
+
+    //ściany
+    private void drawWalls(PApplet p){
+        for (Wall w : walls){
+            w.draw(p);
+        }
+    }
+    private void detectPlayerBulletWallCollisions(){
+        for (int i=bullets.size()-1; i>=0; i--){
+            PlayerBullet pb = bullets.get(i);
+            float pbx = pb.getX();
+            float pby = pb.getY();
+            for (int j = 0; j<walls.size(); j++){
+                Wall w = walls.get(j);
+                float wx = w.getX();
+                float wy = w.getY();
+                float halfW = Settings.WALL_WIDTH / 2f;
+                float halfH = Settings.WALL_HEIGHT / 2f;
+
+                if (pbx >= wx - halfW && pbx <= wx + halfW &&
+                    pby >= wy - halfH && pby <= wy + halfH){
+                    w.decreaseHP();
+                    bullets.remove(i);
+                    if (w.getHP() <= 0){
+                        walls.remove(j);
+                    }
+                    break;
+                }
             }
         }
     }

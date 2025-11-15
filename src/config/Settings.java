@@ -13,10 +13,10 @@ public class Settings {
 
 
     //ENEMY SPEED
-    public static final float ENEMY_SPEED_EASY = 1.5f;
-    public  static final float ENEMY_SPEED_MEDIUM = 3.0f;
-    public static final float ENEMY_SPEED_HARD  = 3.0f;
-
+    public static final float ENEMY_SPEED_EASY_BASE = 1.5f;
+    public  static final float ENEMY_SPEED_MEDIUM_BASE = 3.0f;
+    public static final float ENEMY_SPEED_HARD_BASE  = 3.0f;
+    public static final float ENEMY_SPEED_INCREASE=0.1f; // zwiększenie prędkości po każdym pokonanym wrogu
     //PLAYER
     public static  final float PLAYER_SPEED = 7.0f;
     public static final float PLAYER_WIDTH = 30.0f;
@@ -34,7 +34,16 @@ public class Settings {
     public static final float BUTTON_SPACING = 50.0f;
 
     // BULLET
-    public static final float BULLET_SPEED = -10.0f;
-    public static final float BULLET_RADIUS = 5.0f;
+    public static final float PLAYER_BULLET_SPEED = -10.0f;
+    public static final float PLAYER_BULLET_RADIUS = 5.0f;
     public static final int BULLET_COOLDOWN_FRAMES = 10; // liczba klatek między strzałami
+
+    // WALL
+    public static final float WALL_WIDTH = 88.0f;
+    public static final float WALL_HEIGHT = 20.0f;
+    public static final int WALL_HP = 10;
+    public static final float FIRST_WALL_Y = HEIGHT - 200.0f;
+    public static final float WALL_SPACING = 60.0f;
+    public static final float FIRST_WALL_X = WALL_SPACING + WALL_WIDTH / 2.0f;
+    public static final int WALL_COUNT = 5;
 }
