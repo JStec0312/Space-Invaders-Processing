@@ -5,10 +5,12 @@ import processing.core.PApplet;
 
 public abstract  class Bullet {
     protected float x, y, vy;
-    public Bullet(float x, float y, float vy) {
+    protected int damage;
+    public Bullet(float x, float y, float vy, int damage) {
         this.x = x;
         this.y = y;
         this.vy = vy; //prędkość wstrzykiwana bo może będzimy robić różne rodzaje pocisków
+        this.damage = damage;
     }
 
     public void update(PApplet p){
@@ -23,5 +25,8 @@ public abstract  class Bullet {
     }
     public float getY() {
         return y;
+    }
+    public int getDamage() {
+        return damage;
     }
 }

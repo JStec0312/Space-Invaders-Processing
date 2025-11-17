@@ -46,9 +46,7 @@ public class Wall {
         int bodyCol = p.lerpColor(colDamaged, colHealthy, t);
 
         // --- lekka poświata wokół ściany (aurora) ---
-        p.noStroke();
-        p.fill(10, 20, 40, 140);
-        p.rect(cx, cy, bodyW * 1.35f, bodyH * 1.6f, 20);
+
 
         // --- główna tarcza – heksagonalny „shield” ---
         p.noStroke();

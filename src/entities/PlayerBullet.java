@@ -6,8 +6,8 @@ import entities.Bullet;
 public class PlayerBullet extends Bullet {
     private final float radius;
 
-    public PlayerBullet(float x, float y, float vy, float radius) {
-        super(x, y, vy);
+    public PlayerBullet(float x, float y, float vy, float radius, int damage) {
+        super(x, y, vy, damage);
         this.radius = radius;
     }
 
